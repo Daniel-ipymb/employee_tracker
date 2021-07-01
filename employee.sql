@@ -36,5 +36,5 @@ CREATE TABLE employee (
 );
 
 
-INSERT INTO employees(first_name, last_name, role_id, manager_id)
+INSERT INTO employee(first_name, last_name, role_id, manager_id)
 VALUES('John', 'Adams', 1, 3), ('Mike', 'Epps', 2, 6), ('kevin', 'Gate', 3, NULL), ('Ben', 'Smalls', 4, 6), ('Tom', 'Brady', 5, 3), ('Chirstian', 'Rodriguez', 6, NULL), ('Ashley', 'Withers', 2, 3);
