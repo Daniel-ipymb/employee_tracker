@@ -128,8 +128,39 @@ const addDepartment = () => {
 
 const addRole = async () => {
   // query the database to get all the roles
-  connection.query('SELECT * FROM employee', async (err,data) => {
+  connection.query('SELECT * FROM department', async (err,data) => {
     console.log(data)
+    
+    try {
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          message: "What is the role's title?",
+          name: "title",
+      },
+      {
+          type: "number",
+          message: "Please enter a salary for this role",
+          name: "salary",
+      },
+      {
+          type: "list",
+          message: "Please select which department this role is being added to",
+          choices: data.map(department => department.name),
+          name: "departmentId",
+      }
+      ])
+      await connection.query('INSERT INTO role SET ?', 
+      {
+        title: answers.title,
+        salary: answers.salary,
+        department_id: data.find(department => department.name === answers.departmentId).id
+      })
+      console.log('success')
+    } catch (error) {
+      console.log(error)
+    }
+    start()
   })
 }
 
@@ -137,7 +168,7 @@ const viewRole = () => {
   connection.query('SELECT name, title, salary FROM role INNER JOIN department ON role.department_id = department.id', (err, data) => {
     if (err) throw err
     console.table(data)
-
+    start()
   })
 };
 
@@ -169,10 +200,6 @@ const updateRole = async () => {
   })
 };
 
-const deleteData = () => {
-
-};
-
 async function viewEmployees() {
   const employees = await connection.query('SELECT employee.id,employee.first_name,employee.last_name,role.title,employee.manager_id FROM employee INNER JOIN role ON employee.role_id = role.id',
     (err, data) => {
@@ -181,55 +208,7 @@ async function viewEmployees() {
     })
 }
 
-
-
-// const updateEmployeeManagers = async () => {
-//   connection.query('SELECT * FROM employee', async (err,data) => {
-//     const answers = await inquirer.prompt([
-//       {
-//         type: 'input',
-//         message: "What is the employee's first name? ",
-//         name: "firstName"
-//       },
-//       {
-//         type: 'input',
-//         message: "What is the employee's Last name? ",
-//         name: "lastName"
-//       },
-//       {
-//         type: 'list',
-//         message: "What employee would you like to update? ",
-//         name: "employee",
-//         choices: data.map(employee => rol.title)
-//       }
-//     ])
-//   })
-// };
-
-const updateManager = () => {
-
-}
-
-
-
 connection.connect((err) => {
   if (err) throw err;
   start();
 })
-
-
-
-//connect to database
-
-
-
-
-
-
-
-// terminal logic
-  //inquirer for the user
-      //queries to the database
-          //views (SELECT * from table)
-          //adds(INSERT INTO table new values)
-          //updates(etc)
