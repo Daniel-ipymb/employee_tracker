@@ -77,20 +77,13 @@ const viewDepartment = async () => {
   catch (err) {
     console.log(err)
   }
-
-
-
-
-
-
-
-
+  start()
 }
 
 const addEmployee = async () => {
   //ask the user for the emplyoee details with an inquierer
   connection.query('SELECT * FROM role', async (err, data) => {
-    console.log(data)
+    console.table(data)
 
     const answers = await inquirer.prompt([
       {
@@ -116,47 +109,71 @@ const addEmployee = async () => {
         last_name: answers.lastName,
         role_id: data.find(role => role.title === answers.role).id
       },
-      console.log('success')
-
+      console.log('Employee successfully added')
     )
+    start()
   })
 };
 
 const addDepartment = () => {
-  connection.query('INSERT INTO department ')
+  connection.query('SELECT * FROM department', async (err, data) => {
+    console.table(data)
+
+    try {
+      const answers = await inquirer.prompt([
+        {
+          type: 'input',
+          message: "What department would you like to add?",
+          name: 'departmentName'
+        }
+      ])
+      connection.query("INSERT INTO department SET ?",
+        {
+          name: answers.departmentName
+        },
+        console.log("Department successfully added")
+      )
+    } catch (err) {
+      if (err) {
+        console.log(err)
+      }
+    }
+    start()
+  })
+
 }
 
 const addRole = async () => {
   // query the database to get all the roles
-  connection.query('SELECT * FROM department', async (err,data) => {
-    console.log(data)
-    
+  connection.query('SELECT * FROM department', async (err, data) => {
+    console.table(data)
+
     try {
       const answers = await inquirer.prompt([
         {
           type: "input",
           message: "What is the role's title?",
           name: "title",
-      },
-      {
+        },
+        {
           type: "number",
           message: "Please enter a salary for this role",
           name: "salary",
-      },
-      {
+        },
+        {
           type: "list",
           message: "Please select which department this role is being added to",
           choices: data.map(department => department.name),
           name: "departmentId",
-      }
+        }
       ])
-      await connection.query('INSERT INTO role SET ?', 
-      {
-        title: answers.title,
-        salary: answers.salary,
-        department_id: data.find(department => department.name === answers.departmentId).id
-      })
-      console.log('success')
+      await connection.query('INSERT INTO role SET ?',
+        {
+          title: answers.title,
+          salary: answers.salary,
+          department_id: data.find(department => department.name === answers.departmentId).id
+        })
+      console.log('Role has been successfully added')
     } catch (error) {
       console.log(error)
     }
@@ -174,6 +191,7 @@ const viewRole = () => {
 
 const updateRole = async () => {
   connection.query('SELECT * FROM role', async (err, data) => {
+    console.table(data)
     const answers = await inquirer.prompt([
       {
         type: 'list',
